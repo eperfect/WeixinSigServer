@@ -20,8 +20,6 @@ var (
 	signRes     signSt
 	signResStr  []byte
 	GameURL     string = ""
-	AppID       string = ""
-	AppKey      string = ""
 )
 
 type tokenResponse struct {

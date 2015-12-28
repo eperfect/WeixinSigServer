@@ -16,6 +16,10 @@ var (
 	listenPort string
 )
 
+var listenPort string
+var AppID string
+var AppKey string
+
 func main() {
 	initConfig()
 	startServe()
