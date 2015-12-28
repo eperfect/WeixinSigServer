@@ -1,15 +1,20 @@
 package main
 
 import (
-	"net/http"
+	"bufio"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 
-	"weixin"
 	"github.com/eperfect/goini"
 )
 
-var listenPort string
+var (
+	AppID      string
+	AppKey     string
+	listenPort string
+)
 
 func main() {
 	initConfig()
@@ -19,20 +24,33 @@ func main() {
 func initConfig() {
 	goini.InitConfig("config.ini")
 	listenPort = goini.GetValue("", "port")
-	weixin.AppID = goini.GetValue("", "app_id")
-	weixin.AppKey = goini.GetValue("", "app_key")
+	AppID = goini.GetValue("", "app_id")
+	AppKey = goini.GetValue("", "app_key")
 }
 
 func startServe() {
 	http.HandleFunc("/info", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		fmt.Fprintf(w, "%q", weixin.GetUserInfo(r))
+		fmt.Fprintf(w, "%q", GetUserInfo(r))
 	})
 
 	http.HandleFunc("/sign", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		fmt.Fprintf(w, "%q", weixin.GetSign(r))
+		fmt.Fprintf(w, "%q", GetSign(r))
 	})
-	
-	log.Fatal(http.ListenAndServe(":" + listenPort, nil))
+
+	http.ListenAndServe(":"+listenPort, nil)
+	acceptUserInput()
+}
+
+func acceptUserInput() {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		data, _, _ := reader.ReadLine()
+		command := string(data)
+		log.Println("command:", command)
+		if command == "stop" {
+			break
+		}
+	}
 }
